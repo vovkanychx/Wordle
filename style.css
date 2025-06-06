@@ -37,7 +37,7 @@ body{
     display: grid;
     min-width: calc(var(--size) * var(--chars));
     min-height: calc(var(--size) * var(--guesses));
-    grid-template-columns: repeat(var(--chars), 1fr);
+    grid-template-columns: 1fr;
     grid-template-rows: repeat(var(--guesses), 1fr);
     gap: 5px;
     pointer-events: none;
