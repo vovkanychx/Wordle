@@ -31,10 +31,10 @@ CELLS.forEach((cell, index) => {
         // ENTER HANDLING
         if (cell.parentElement.querySelector('.last').value.length === 1 && e.key === 'Enter') { // focus on the next row's first cell when enter pressed
             if (CELLS[CELLS.length - 1] === document.activeElement) { // if last cell is filled and enter hit, don't move to the next
-                cell.parentElement.childNodes.forEach(child => { child.readOnly = true }) // make inputs readonly after "Enter" pressed
+                cell.parentElement.childNodes.forEach(child => { child.readOnly = true; child.disabled = true; }) // make inputs readonly and disabled after "Enter" pressed
                 return;
             } else {
-                cell.parentElement.childNodes.forEach(child => { child.readOnly = true }) // make inputs readonly after "Enter" pressed
+                cell.parentElement.childNodes.forEach(child => { child.readOnly = true; child.disabled = true; }) // make inputs readonly and disabled after "Enter" pressed
                 cell.parentElement.nextElementSibling.firstElementChild.focus(); // focus on the first cell in the next row
             }
         }
