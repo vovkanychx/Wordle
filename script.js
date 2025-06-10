@@ -1,7 +1,6 @@
 const GRID = document.querySelector('.grid');
 const ROWS = document.querySelectorAll('.row');
 const CELLS = document.querySelectorAll('.cell');
-const LAST = document.querySelectorAll('.last')
 
 ROWS.forEach((row, index) => {
     row.firstElementChild.classList.add('first'); // mark the first cell in the row
@@ -46,3 +45,50 @@ CELLS.forEach((cell, index) => {
         }
     })
 })
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max); // get random INT number
+}
+
+const WORDS = { // JSON object containing 5 letter words
+    1: 'nigga',
+    2: 'crack',
+    3: 'whore',
+    4: 'sluts',
+    5: 'floyd'
+}
+
+const WORDS_LENGTH = Object.keys(WORDS).length; // length of objects in JSON object named WORDS
+const CURRENT_WORD = WORDS[getRandomInt(WORDS_LENGTH) + 1]; // get today's word guess from JSON object named WORDS
+let GUESSED_WORD = ''; // initialize guessed word in a row
+
+console.log(CURRENT_WORD);
+
+document.addEventListener('keydown', e => {
+    const lastInRowCells = document.querySelectorAll('.last'); // get all last cells in all rows
+    GUESSED_WORD += e.target.value; // save guessed word from inputs in a row of filled cells
+    if (e.target.classList.contains('last') && e.key === 'Enter') {
+        lastInRowCells.forEach(lastInRowCells => { // loop through all last in the rows cells
+            Array.from(lastInRowCells.parentElement.children).forEach((cell, index) => { // take last row's cell parent, then parent's children and convert them to array and loop through
+                if (cell.value.toLowerCase() === CURRENT_WORD[index].toLowerCase()) { // make lowercase each input value and today's word to guess, if they equal, add correct class to a cell
+                    cell.classList.add('correct'); // CORRECT LETTERS HANDLING
+                } else if (CURRENT_WORD.includes(cell.value.toLowerCase()) && cell.value !== '') { 
+                    cell.classList.add('inword'); // IN WORD LETTERS HANDLING
+                } else if (!CURRENT_WORD.includes(cell.value.toLowerCase()) && cell.value !== '') { 
+                    cell.classList.add('wrong'); // WRONG LETTERS HANDLING
+                }
+            });
+        });
+        if (GUESSED_WORD.toLowerCase() === CURRENT_WORD.toLowerCase()) { // if all letters from guessed word match current word
+            CELLS.forEach(cell => cell.disabled = true); // disable inputs
+            return; // stop the game
+        }
+        GUESSED_WORD = ''; // reset guessed word when enter pressed
+    }
+})
+
+CELLS.forEach(cell => {
+    cell.addEventListener('select', e => {
+        e.target.selectionStart = e.target.selectionEnd; // disable a selection in the cell that can be focused by Tab key press
+    }, false)
+});
