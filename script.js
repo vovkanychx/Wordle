@@ -1,6 +1,15 @@
 const GRID = document.querySelector('.grid');
 const ROWS = document.querySelectorAll('.row');
 const CELLS = document.querySelectorAll('.cell');
+const WINSTREAK = document.querySelector('.winstreak').firstElementChild;
+
+let isWin;
+let winStreak = 0;
+
+localStorage.getItem('winStreak') == null ? localStorage.setItem('winStreak', winStreak) : winStreak = Number.parseInt(localStorage.getItem('winStreak'));
+localStorage.getItem('winStreak') == null ? WINSTREAK.textContent = 0 : WINSTREAK.textContent = localStorage.getItem('winStreak');
+
+console.log(localStorage.getItem('winStreak'))
 
 ROWS.forEach((row, index) => {
     row.firstElementChild.classList.add('first'); // mark the first cell in the row
@@ -10,38 +19,25 @@ ROWS.forEach((row, index) => {
 CELLS.forEach((cell, index) => {
     cell.addEventListener('keydown', e => {
         // BACKSPACE HANDLING
-        if (cell.classList.contains('first') && cell.value.length === 1 && e.key === 'Backspace') { // fix first cell focus on next cell if Backspace pressed
-            cell.value = '';
-        }
-        if (cell.value.length === 1 && e.key === 'Backspace') { // focus on current cell if Backspace pressed and current has data then focus on the previous cell
-            if (cell.classList.contains('last')) { // fix for overriding last cell value = '' when Enter was pressed then Backspace was pressed and inputs were editable
-                return
+        if (e.key === 'Backspace') {
+            if (e.target.value.length === 0) {
+                if (e.target.previousElementSibling === null) { return } // if first cell in a row is empty and backspace hit - stop focusing
+                e.target.previousElementSibling.focus();
             }
-            cell.focus();
-            cell.value = '';
-            cell.previousElementSibling.focus();
-        } else if (cell.value.length === 0 && e.key === 'Backspace') { // focus on previous cell if Backspace pressed and current has no data
-            if (cell.classList.contains('first')) { // stop focusing on previous cell if current cell is the first one
-                return
-            }
-            cell.previousElementSibling.focus();
-            cell.value = '';
-        }
-        // ENTER HANDLING
-        if (cell.parentElement.querySelector('.last').value.length === 1 && e.key === 'Enter') { // focus on the next row's first cell when enter pressed
-            if (CELLS[CELLS.length - 1] === document.activeElement) { // if last cell is filled and enter hit, don't move to the next
-                cell.parentElement.childNodes.forEach(child => { child.readOnly = true; child.disabled = true; }) // make inputs readonly and disabled after "Enter" pressed
-                return;
-            } else {
-                cell.parentElement.childNodes.forEach(child => { child.readOnly = true; child.disabled = true; }) // make inputs readonly and disabled after "Enter" pressed
-                cell.parentElement.nextElementSibling.firstElementChild.focus(); // focus on the first cell in the next row
+            else if (e.target.value.length > 0) {
+                e.target.value = '';
             }
         }
+        // CELLS FOCUSING HANDLING
         if (e.target.value.length === 1) { // focus on the next cell when current cell is filled
-            if (e.target.classList.contains('last')) { // dont continue focusing on next cell if current is the last one in the row
-                return;
+            if (e.target.classList.contains('last')) { // if last row's cell is active at the moment
+                if (e.key === 'Enter') { // when Enter was pressed
+                    if (e.target.parentElement.nextElementSibling === null) { return } // stop if there's no next row (last row at the moment active)
+                    e.target.parentElement.nextElementSibling.firstElementChild.focus(); // focus on the next row's first cell
+                }
+            } else {
+                e.target.nextElementSibling.focus(); // focus on the next cell if it exists
             }
-            CELLS[index].nextElementSibling.focus(); // focus on the next cell if it exists
         }
     })
 })
@@ -66,8 +62,9 @@ console.log(CURRENT_WORD);
 
 document.addEventListener('keydown', e => {
     const lastInRowCells = document.querySelectorAll('.last'); // get all last cells in all rows
-    GUESSED_WORD += e.target.value; // save guessed word from inputs in a row of filled cells
     if (e.target.classList.contains('last') && e.key === 'Enter') {
+        Array.from(e.target.parentElement.children).forEach(guess => GUESSED_WORD += guess.value) // save guessed word from inputs in a row of filled cells
+        // LETTERS CHECKING
         lastInRowCells.forEach(lastInRowCells => { // loop through all last in the rows cells
             Array.from(lastInRowCells.parentElement.children).forEach((cell, index) => { // take last row's cell parent, then parent's children and convert them to array and loop through
                 if (cell.value.toLowerCase() === CURRENT_WORD[index].toLowerCase()) { // make lowercase each input value and today's word to guess, if they equal, add correct class to a cell
@@ -76,14 +73,22 @@ document.addEventListener('keydown', e => {
                     cell.classList.add('inword'); // IN WORD LETTERS HANDLING
                 } else if (!CURRENT_WORD.includes(cell.value.toLowerCase()) && cell.value !== '') { 
                     cell.classList.add('wrong'); // WRONG LETTERS HANDLING
+                    isWin = false;
                 }
             });
         });
+        // WIN HANDLING
         if (GUESSED_WORD.toLowerCase() === CURRENT_WORD.toLowerCase()) { // if all letters from guessed word match current word
             CELLS.forEach(cell => cell.disabled = true); // disable inputs
+            winStreak += 1;
+            localStorage.setItem('winStreak', winStreak);
+            WINSTREAK.textContent = winStreak;
+            isWin = true;
+            console.log(localStorage)
             return; // stop the game
         }
         GUESSED_WORD = ''; // reset guessed word when enter pressed
+        isWin === false ? localStorage.setItem('winStreak', 0) : isWin;
     }
 })
 
@@ -92,3 +97,14 @@ CELLS.forEach(cell => {
         e.target.selectionStart = e.target.selectionEnd; // disable a selection in the cell that can be focused by Tab key press
     }, false)
 });
+
+CELLS[CELLS.length - 1].addEventListener('keydown', e => { // last cell in the grid
+    if (e.key === 'Enter' && e.target.value.length === 1) {
+        // LOSE HANDLING
+        isWin === false ? console.log('loss') : console.log('win')
+            console.log('end')
+            return
+    } else {
+        console.log('not end')
+    }
+})
