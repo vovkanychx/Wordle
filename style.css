@@ -14,6 +14,7 @@
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 body{
+    position: relative;
     padding: 5%;
     max-height: 100vh;
     max-width: 100vw;
@@ -27,6 +28,67 @@ body{
     align-items: center;
     flex-wrap: wrap;
     gap: 5%;
+}
+svg{
+    width: 24px;
+    height: 24px;
+}
+button{
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+}
+button:focus-visible{
+    outline: none;
+}
+.menu{
+    position: absolute;
+    top: 5%;
+    right: 5%;
+}
+.menu #settings{
+    display: block;
+    margin-left: auto;
+}
+.menu #settings svg{
+    width: 32px;
+    height: 32px;
+    transition: all 1s ease-in-out;
+}
+.menu #settings:hover svg{
+    transform: rotate(180deg);
+}
+ul{
+    list-style: none;
+}
+.options{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin: 10px;
+}
+.option{
+    width: 24px;
+    height: 24px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+}
+.close{
+    display: block;
+    margin: 10px 10px 0 auto;
+}
+dialog{
+    width: 50%;
+    margin: 15% auto;
+    border: none;
+}
+dialog::backdrop{
+    background-color: rgba(0, 0, 0, 0.8);
+}
+form[method=dialog]{
+    display: flex;
+    flex-direction: column;
 }
 .info{
     width: 100%;
