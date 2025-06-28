@@ -2,6 +2,13 @@ const GRID = document.querySelector('.grid');
 const ROWS = document.querySelectorAll('.row');
 const CELLS = document.querySelectorAll('.cell');
 const WINSTREAK = document.querySelector('.winstreak').firstElementChild;
+const settingsDialog = document.getElementById('dialog_settings');
+const settingsBtn = document.getElementById('settings');
+const themeBtn = document.getElementById('theme');
+const hintBtn = document.getElementById('hint');
+const charsBtn = document.getElementById('characters');
+const infoBtn = document.getElementById('info');
+const closeSettingsBtn = document.querySelector('.close.dialog_settings');
 
 let isWin;
 let winStreak = 0;
@@ -10,6 +17,30 @@ localStorage.getItem('winStreak') == null ? localStorage.setItem('winStreak', wi
 localStorage.getItem('winStreak') == null ? WINSTREAK.textContent = 0 : WINSTREAK.textContent = localStorage.getItem('winStreak');
 
 console.log(localStorage.getItem('winStreak'))
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max); // get random INT number
+}
+
+function overlayClickClose(event) {
+    if (event.target === this) {
+        this.close();
+    }
+}
+
+const WORDS = { // JSON object containing 5 letter words
+    1: 'nigga',
+    2: 'crack',
+    3: 'whore',
+    4: 'sluts',
+    5: 'floyd'
+}
+
+const WORDS_LENGTH = Object.keys(WORDS).length; // length of objects in JSON object named WORDS
+const CURRENT_WORD = WORDS[getRandomInt(WORDS_LENGTH) + 1]; // get today's word guess from JSON object named WORDS
+let GUESSED_WORD = ''; // initialize guessed word in a row
+
+console.log(CURRENT_WORD);
 
 ROWS.forEach((row, index) => {
     row.firstElementChild.classList.add('first'); // mark the first cell in the row
@@ -42,25 +73,10 @@ CELLS.forEach((cell, index) => {
     })
 })
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max); // get random INT number
-}
-
-const WORDS = { // JSON object containing 5 letter words
-    1: 'nigga',
-    2: 'crack',
-    3: 'whore',
-    4: 'sluts',
-    5: 'floyd'
-}
-
-const WORDS_LENGTH = Object.keys(WORDS).length; // length of objects in JSON object named WORDS
-const CURRENT_WORD = WORDS[getRandomInt(WORDS_LENGTH) + 1]; // get today's word guess from JSON object named WORDS
-let GUESSED_WORD = ''; // initialize guessed word in a row
-
-console.log(CURRENT_WORD);
-
 document.addEventListener('keydown', e => {
+    if (e.key === ' ' || e.key === 'Spacebar') { // ' ' is standard, 'Spacebar' was used by IE9 and Firefox < 37
+        e.preventDefault()
+    }
     const lastInRowCells = document.querySelectorAll('.last'); // get all last cells in all rows
     if (e.target.classList.contains('last') && e.key === 'Enter') {
         Array.from(e.target.parentElement.children).forEach(guess => GUESSED_WORD += guess.value) // save guessed word from inputs in a row of filled cells
@@ -108,3 +124,14 @@ CELLS[CELLS.length - 1].addEventListener('keydown', e => { // last cell in the g
         console.log('not end')
     }
 })
+
+settingsBtn.addEventListener('click', (e) => {
+    settingsDialog.showModal();
+})
+
+closeSettingsBtn.addEventListener('click', (e) => {
+    settingsDialog.close();
+})
+
+settingsDialog.addEventListener('click', overlayClickClose)
+settingsDialog.addEventListener('cancel', e => { e.target.close() })
