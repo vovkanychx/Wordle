@@ -8,52 +8,103 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <menu class="menu">
+        <button id="settings" title="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
+                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+            </svg>
+        </button>
+        <dialog id="dialog_settings">
+            <form method="dialog"> <!-- form to enable dialog closing on click outside of it -->
+                <button class="close dialog_settings" title="Close.">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <path d="M17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41L17.59 5Z" fill="black"/>
+                    </svg>
+                </button>
+                <ul class="options">
+                    <li class="option">
+                        <button id="theme" title="Choose the theme.">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-circle-half" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+                            </svg>
+                        </button>
+                    </li>
+                    <li class="option">
+                        <button id="hint" title="Ask for a hint.">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightbulb" viewBox="0 0 16 16">
+                                <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z"/>
+                            </svg>
+                        </button>
+                    </li>
+                    <li class="option">
+                        <button id="characters" title="Change word length.">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-letter-spacing" viewBox="3 3 18 18" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M5 12v-5.5a2.5 2.5 0 0 1 5 0v5.5m0 -4h-5" />
+                                <path d="M13 4l3 8l3 -8" />
+                                <path d="M5 18h14" />
+                                <path d="M17 20l2 -2l-2 -2" />
+                                <path d="M7 16l-2 2l2 2" />
+                            </svg>
+                        </button>
+                    </li>
+                    <li class="option">
+                        <button id="info" title="How to play?">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/> <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                        </button>
+                    </li>
+                </ul>
+            </form>
+        </dialog>
+    </menu>
     <div class="info">
         <h1>Welcome, wordler!</h1>
         <div class="winstreak">Your current winstreak is: <span></span></div>
     </div>
     <div class="grid">
         <div class="row" id="1">
-            <input type="text" class="cell empty" id="{1}" maxlength="1" autofocus>
-            <input type="text" class="cell empty" id="{2}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{3}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{4}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{5}" maxlength="1" autofocus tabindex="-1">
+            <input type="text" class="cell empty" id="1" maxlength="1" autofocus>
+            <input type="text" class="cell empty" id="2" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="3" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="4" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="5" maxlength="1" tabindex="-1">
         </div>
         <div class="row" id="2">
-            <input type="text" class="cell empty" id="{6}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{7}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{8}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{9}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{10}" maxlength="1" autofocus tabindex="-1">
+            <input type="text" class="cell empty" id="6" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="7" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="8" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="9" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="10" maxlength="1" tabindex="-1">
         </div>
         <div class="row" id="3">
-            <input type="text" class="cell empty" id="{11}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{12}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{13}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{14}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{15}" maxlength="1" autofocus tabindex="-1">
+            <input type="text" class="cell empty" id="11" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="12" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="13" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="14" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="15" maxlength="1" tabindex="-1">
         </div>
         <div class="row" id="4">
-            <input type="text" class="cell empty" id="{16}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{17}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{18}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{19}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{20}" maxlength="1" autofocus tabindex="-1">
+            <input type="text" class="cell empty" id="16" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="17" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="18" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="19" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="20" maxlength="1" tabindex="-1">
         </div>
         <div class="row" id="5">
-            <input type="text" class="cell empty" id="{21}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{22}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{23}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{24}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{25}" maxlength="1" autofocus tabindex="-1">
+            <input type="text" class="cell empty" id="21" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="22" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="23" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="24" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="25" maxlength="1" tabindex="-1">
         </div>
         <div class="row" id="6">
-            <input type="text" class="cell empty" id="{26}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{27}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{28}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{29}" maxlength="1" autofocus tabindex="-1">
-            <input type="text" class="cell empty" id="{30}" maxlength="1" autofocus tabindex="-1">
+            <input type="text" class="cell empty" id="26" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="27" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="28" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="29" maxlength="1" tabindex="-1">
+            <input type="text" class="cell empty" id="30" maxlength="1" tabindex="-1">
         </div>
     </div>
 </body>
