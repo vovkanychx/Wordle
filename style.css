@@ -131,11 +131,20 @@ body {
     min-width: calc(100px + 1vmin);
 }
 [data-key="BACKSPACE"] {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-[data-key="BACKSPACE"] > img {
+[data-key="BACKSPACE"]::after {
+    position: absolute;
+    content: "";
+    z-index: 5;
+    background-image: url("backspace.png");
+    background-size: contain;
     width: clamp(24px, 3vmin, 40px);
     height: clamp(24px, 3vmin, 40px);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

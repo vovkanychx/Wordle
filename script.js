@@ -6,6 +6,7 @@ const latinLettersRegex = /^[a-zA-Z]$/
 const randomIndex = Math.floor(Math.random() * WORDS.length);
 const SECRET_WORD = WORDS[randomIndex].toUpperCase();
 let GUESSED_WORD = ""
+let isLastGuess = false
 console.log(SECRET_WORD)
 
 let activeCell = cells[0]
@@ -25,6 +26,7 @@ document.addEventListener("keydown", function (event) {
     }
     if (event.code === "Backspace") { // handle backspace
         event.preventDefault()
+        if (isLastGuess) return
         current.value = ""
         current.classList.remove("full")
         if (previous) {
@@ -49,6 +51,7 @@ document.addEventListener("keydown", function (event) {
             }
             if (!current.parentElement.nextElementSibling) { // last guess aka last row
                 console.log('end')
+                isLastGuess = true
                 return 
             }
             current.parentElement.querySelectorAll(".cell").forEach(cell => cell.disabled = true) // disable current row's cells
@@ -79,6 +82,79 @@ document.addEventListener("keydown", function (event) {
     }
 })
 
+document.addEventListener("mousedown", function(event) { // auto focus on cell if mouse clicked anywhere
+    event.preventDefault(); 
+    if (activeCell) {
+        activeCell.focus();
+    }
+})
+
+document.querySelector(".keyboard").addEventListener("mousedown", function KeyClick(event) {
+    event.stopImmediatePropagation()
+    event.preventDefault()
+    if (event.target.matches(".key")) {
+        const current = document.activeElement
+        const next = current.nextElementSibling
+        const previous = current.previousElementSibling
+        const keyText = event.target.dataset.key.toUpperCase()
+
+        if (!current || !current.matches(".cell")) return
+
+        if (keyText === "BACKSPACE") {
+            if (isLastGuess) return
+            if (current.value.length === 1) {
+                current.value = ""
+                current.classList.remove("full")
+                if (previous) {
+                    previous.focus()
+                }
+            }
+            return
+        }
+
+        if (keyText === "ENTER") {
+            if (current.id % 5 === 0) {
+                const row = current.parentElement
+                row.querySelectorAll(".cell").forEach(cell => { // save inputs as 1 word
+                    GUESSED_WORD += cell.value.toUpperCase()
+                })
+                CheckWord(row)
+                for (let i = 0; i < SECRET_WORD.length; i++) { // check win
+                    if (GUESSED_WORD.toUpperCase() === SECRET_WORD.toUpperCase()) {
+                        console.log("WIN")
+                        cells.forEach(cell => cell.disabled = true) // disable all cells because win
+                        return
+                    }
+                }
+                if (!current.parentElement.nextElementSibling) { // last guess aka last row
+                    console.log('end')
+                    isLastGuess = true
+                    return 
+                }
+                current.parentElement.querySelectorAll(".cell").forEach(cell => cell.disabled = true) // disable current row's cells
+                GUESSED_WORD = "" // reset guessed word after guess was made
+                setTimeout(() => {
+                    current.parentElement.nextElementSibling.firstElementChild.focus() // focus on first cell of next row
+                    return
+                }, 2000)
+            } else {
+                return
+            }
+        }
+
+        if (current.value.length === 0) {
+            current.value = keyText
+            current.classList.add("full")
+        } else {
+            if (next) {
+                next.focus()
+                next.value = keyText
+                next.classList.add("full")
+            }
+        }
+    }
+})
+
 function CheckWord(row) {
     let CurrentWordArray = GUESSED_WORD.toUpperCase().split("")
     let SecretWordArray = SECRET_WORD.toUpperCase().split("")
@@ -103,60 +179,3 @@ function CheckWord(row) {
         cell.style.transitionDelay = `${delay}ms`;
     }
 }
-
-document.addEventListener("mousedown", function(event) { // auto focus on cell if mouse clicked anywhere
-    event.preventDefault(); 
-    if (activeCell) {
-        activeCell.focus();
-    }
-})
-
-document.querySelector(".keyboard").addEventListener("click", function KeyClick(event) {
-    event.preventDefault()
-    if (event.target.matches(".key")) {
-        if (activeCell.value.length === 0) {
-            activeCell.value = event.target.dataset.key.toUpperCase()
-            activeCell.classList.add("full")
-            setTimeout(() => {
-                activeCell.nextElementSibling.focus()
-                activeCell.nextElementSibling.select()
-            }, 0);
-            } else {
-                if (activeCell.value.length === 1) {
-                    setTimeout(() => {
-                        activeCell.nextElementSibling.focus()
-                        activeCell.nextElementSibling.select()
-                    }, 0);
-                }
-            }
-    }
-    console.log(activeCell)
-})
-
-// document.querySelector(".keyboard").addEventListener("mousedown", function KeyClick(event) {
-//     if (!event.target.matches(".key")) return
-//     event.preventDefault()
-
-//     const active = document.activeElement
-//     if (!active || !active.matches(".cell")) return
-//     const keyText = event.target.dataset.key.toUpperCase()
-
-//     active.value = keyText;
-//     active.classList.add("full");
-
-//     const freshCells = document.querySelectorAll('.cell');
-//     const cellsArray = Array.from(freshCells);
-//     const currentIndex = cellsArray.indexOf(active);
-
-//     if (currentIndex !== -1 && currentIndex < cellsArray.length - 1) {
-//         const nextCell = cellsArray[currentIndex + 1];
-
-//         setTimeout(() => {
-//             nextCell.focus();
-            
-//             // Якщо на мобільних пристроях фокус усе одно вередує, 
-//             // цей рядок примусово виділить наступний інпут
-//             nextCell.select(); 
-//         }, 0);
-//     }
-// });
