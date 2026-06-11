@@ -1,10 +1,16 @@
-*{
+:root {
+    --animationSpeed: 800ms;
+    --wrong: #464646;
+    --match: #ffd900;
+    --correct: #00d312;
+}
+* {
     box-sizing: border-box;
     padding: 0;
     margin: 0;
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none;     /* IE 10 і Edge */
-    user-select: none;         /* Стандарт для Chrome, Firefox, Opera */
+    user-select: none;         /* Standart for Chrome, Firefox, Opera */
 }
 body {
     display: flex;
@@ -44,7 +50,7 @@ body {
     font-weight: 600;
     caret-color: transparent;
     background-color: transparent;
-    border: 3px solid #ccc;
+    border: 2px solid #ccc;
     color: inherit;
     pointer-events: none;
 }
@@ -63,22 +69,22 @@ body {
     animation: FillTile 100ms ease-out;
 }
 .cell.wrong {
-    background-color: #464646;
-    border-color: #464646;
-    color: #fff;
-}
-.cell.correct {
-    background-color: #00d312;
-    border-color: #00d312;
+    background-color: var(--wrong);
+    border-color: var(--wrong);
     color: #fff;
 }
 .cell.match {
-    background-color: #ffd900;
-    border-color: #ffd900;
+    background-color: var(--match);
+    border-color: var(--match);
+    color: #fff;
+}
+.cell.correct {
+    background-color: var(--correct);
+    border-color: var(--correct);
     color: #fff;
 }
 .cell.flip {
-    animation: RotateTile 800ms linear forwards;
+    animation: RotateTile var(--animationSpeed) linear forwards;
 }
 @keyframes RotateTile {
     0% {
@@ -149,14 +155,46 @@ body {
     transform: translate(-50%, -50%);
 }
 .key.wrong {
-    background-color: #464646;
-    color: #fff;
-}
-.key.correct {
-    background-color: #00d312;
+    background-color: var(--wrong);
     color: #fff;
 }
 .key.match {
-    background-color: #ffd900;
+    background-color: var(--match);
     color: #fff;
+}
+.key.correct {
+    background-color: var(--correct);
+    color: #fff;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #141414;
+    }
+    .cell {
+        border-color: #505050;
+        color: #fff;
+    }
+    .cell:focus, .cell:active, .cell:focus-visible {
+        border-color: #505050;
+    }
+    .cell.full {
+        border-color: #707070;
+    }
+    .cell.wrong {
+        border-color: var(--wrong);
+        color: #fff;
+    }
+    .cell.match {
+        border-color: var(--match);
+    }
+    .cell.correct {
+        border-color: var(--correct);
+    }
+    .key  {
+        background-color: #7a7a7a;
+        color: #fff;
+    }
+    [data-key="BACKSPACE"]::after {
+        filter: invert(1);
+    }
 }

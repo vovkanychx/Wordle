@@ -156,12 +156,14 @@ function eraseChar(event, currentElement, previousElement) {
 function checkWord(row, guessedWord, secretWord) {
     let CurrentWordArray = guessedWord.toUpperCase().split("")
     let SecretWordArray = secretWord.toUpperCase().split("")
-
+    let animationEnd = (secretWord.length - 1) * 400 + 800
     for (let i = 0; i < secretWord.length; i++) {
         let cell = row.querySelectorAll(".cell")[i];
         if (CurrentWordArray[i] === SecretWordArray[i]) {
             cell.classList.add("correct")
-            document.querySelector(`[data-key="${cell.value.toUpperCase()}"]`).classList.add("correct")
+            setTimeout(() => {
+                document.querySelector(`[data-key="${cell.value.toUpperCase()}"]`).classList.add("correct")
+            }, animationEnd)
             SecretWordArray[i] = null; 
             CurrentWordArray[i] = null; 
         }
@@ -170,7 +172,7 @@ function checkWord(row, guessedWord, secretWord) {
         let cell = row.querySelectorAll(".cell")[i]
         let finalClass = "wrong"
         if (cell.classList.contains("correct")) {
-            finalClass = "correct";
+            finalClass = "correct"
         } else {
             let poolIndex = SecretWordArray.indexOf(CurrentWordArray[i])
             if (poolIndex !== -1) {
@@ -181,59 +183,31 @@ function checkWord(row, guessedWord, secretWord) {
         const delay = i * 400
         cell.classList.add("flip")
         cell.style.animationDelay = `${delay}ms`
-        cell.style.transitionDelay = `${delay}ms`
+        cell.style.transitionDelay = `${delay + 400}ms`
         cell.classList.add(finalClass)
+
         let originalLetter = CurrentWordArray[i]; 
-        
         let key = document.querySelector(`[data-key="${originalLetter}"]`);
-        
-        if (key) { // CHECK FOR LETTER COLORING !!!!!! IT IS NOT WORKING PROPERLY NOW !!! wrong>logic>clock
-            // ЛОГІКА ПОКРАЩЕННЯ КОЛЬОРУ:
-            
-            if (finalClass === "correct") {
-                // Якщо літера зелена — примусово фарбуємо кнопку в зелений (це топ-статус)
-                key.classList.remove("match", "wrong");
-                key.classList.add("correct");
-            } 
-            else if (finalClass === "match") {
-                // Якщо літера жовта — фарбуємо кнопку ТІЛЬКИ якщо вона ще НЕ зелена
-                if (!key.classList.contains("correct")) {
-                    key.classList.remove("wrong");
-                    key.classList.add("match");
-                }
-            } 
-            else if (finalClass === "wrong") {
-                // Якщо літера чорна — фарбуємо кнопку ТІЛЬКИ якщо вона ще взагалі не вгадувалась (не зелена і не жовта)
-                if (!key.classList.contains("correct") && !key.classList.contains("match")) {
-                    key.classList.add("wrong");
+        setTimeout(() => {
+            if (key) {
+                if (finalClass === "correct") {
+                    key.classList.remove("match", "wrong")
+                    key.classList.add("correct")
+                } 
+                else if (finalClass === "match") {
+                    if (!key.classList.contains("correct")) {
+                        key.classList.remove("wrong")
+                        key.classList.add("match")
+                    }
+                } 
+                else if (finalClass === "wrong") {
+                    if (!key.classList.contains("correct") && !key.classList.contains("match")) {
+                        key.classList.add("wrong")
+                    }
                 }
             }
-        } // CHECK FOR LETTER COLORING !!!!!! IT IS NOT WORKING PROPERLY NOW !!! wrong>logic>clock
-    } 
-    // for (let i = 0; i < secretWord.length; i++) {
-        // let cell = row.querySelectorAll(".cell")[i]
-        // let key = document.querySelector(`[data-key="${cell.value.toUpperCase()}"]`)
-        // let poolIndex = SecretWordArray.indexOf(CurrentWordArray[i]);
-
-        // if (CurrentWordArray[i] === SecretWordArray[i]) {
-        //     cell.classList.add("correct")
-        //     setTimeout(() => {
-        //         key.classList.add("correct")
-        //     }, 2000) // 2000 = secretWord.length * 400
-        // }
-        // else if (poolIndex !== -1) {
-        //     cell.classList.add("match")
-        //     setTimeout(() => {
-        //         key.classList.add("match")
-        //     }, 2000)
-        // } 
-        // else {
-        //     cell.classList.add("wrong")
-        //     setTimeout(() => {
-        //         key.classList.add("wrong")
-        //     }, 2000)
-        // }
-    // }
+        }, animationEnd)
+    }
 }
 
 function checkWin(guessedWord, secretWord, cellsArray) {
