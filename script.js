@@ -3,36 +3,43 @@ import WORDS from "./words.js"
 const cells = document.querySelectorAll(".cell")
 const keys = document.querySelectorAll(".key")
 const latinLettersRegex = /^[a-zA-Z]$/
-const randomIndex = Math.floor(Math.random() * WORDS.length);
-const SECRET_WORD = WORDS[randomIndex].toUpperCase();
+const randomIndex = Math.floor(Math.random() * WORDS.length)
+// const SECRET_WORD = WORDS[randomIndex].toUpperCase()
+const SECRET_WORD = "CLOUD"
 let GUESSED_WORD = ""
 let isLastGuess = false
+let isWin = false
 console.log(SECRET_WORD)
 
 let activeCell = cells[0]
 window.addEventListener('DOMContentLoaded', () => {
-    if (activeCell) activeCell.focus(); // focus on first cell as game loads
-});
+    if (activeCell) activeCell.focus() // focus on first cell as game loads
+})
+document.addEventListener("mousedown", function(event) { // auto focus on cell if mouse clicked anywhere
+    event.preventDefault()
+    if (isWin) return
+    if (activeCell) {
+        activeCell.focus()
+    } else {
+        activeCell.nextElementSibling.focus()
+    }
+})
+window.addEventListener("click", () => {
+    activeCell = document.querySelector(".current")
+})
 
 document.addEventListener("keydown", function (event) {
+    if (isWin) return
     const current = event.target
     const previous = event.target.previousElementSibling
     const next = event.target.nextElementSibling
-    activeCell = current // for autofocus when mouse clicked
 
     if (event.code === "Tab") { // disable tab indexing
         event.preventDefault()
         return
     }
     if (event.code === "Backspace") { // handle backspace
-        event.preventDefault()
-        if (isLastGuess) return
-        current.value = ""
-        current.classList.remove("full")
-        if (previous) {
-            previous.focus()
-        }
-        return;
+        eraseChar(event, current, previous)
     }
 
     if (event.code === "Enter") { // handle enter pressed/guess made
@@ -40,17 +47,9 @@ document.addEventListener("keydown", function (event) {
             current.parentElement.querySelectorAll(".cell").forEach(cell => { // save inputs as 1 word
                 GUESSED_WORD += cell.value.toUpperCase()
             });
-            CheckWord(current.parentElement)
-            for (let i = 0; i < SECRET_WORD.length; i++) { // check win
-                if (GUESSED_WORD.toUpperCase() === SECRET_WORD.toUpperCase()) {
-                    console.log("WIN")
-                    cells.forEach(cell => cell.disabled = true) // disable all cells because win
-                    event.preventDefault()
-                    return
-                }
-            }
+            checkWord(current.parentElement, GUESSED_WORD, SECRET_WORD)
+            checkWin(GUESSED_WORD, SECRET_WORD, cells)
             if (!current.parentElement.nextElementSibling) { // last guess aka last row
-                console.log('end')
                 isLastGuess = true
                 return 
             }
@@ -69,29 +68,14 @@ document.addEventListener("keydown", function (event) {
         return
     }
 
-    if (current.value.length === 0) { // assing entered key to input's value
-        current.value = event.key
-        current.classList.add("full")
-    } 
-    else {
-        if (next) { // focus on next cell
-            next.focus()
-            next.value = event.key
-            next.classList.add("full")
-        }
-    }
+    isEmpty(current)
+    addChar(current, next, event.key)
 })
 
-document.addEventListener("mousedown", function(event) { // auto focus on cell if mouse clicked anywhere
-    event.preventDefault(); 
-    if (activeCell) {
-        activeCell.focus();
-    }
-})
-
-document.querySelector(".keyboard").addEventListener("mousedown", function KeyClick(event) {
+document.querySelector(".keyboard").addEventListener("mousedown", function (event) {
     event.stopImmediatePropagation()
     event.preventDefault()
+    if (isWin) return
     if (event.target.matches(".key")) {
         const current = document.activeElement
         const next = current.nextElementSibling
@@ -101,15 +85,7 @@ document.querySelector(".keyboard").addEventListener("mousedown", function KeyCl
         if (!current || !current.matches(".cell")) return
 
         if (keyText === "BACKSPACE") {
-            if (isLastGuess) return
-            if (current.value.length === 1) {
-                current.value = ""
-                current.classList.remove("full")
-                if (previous) {
-                    previous.focus()
-                }
-            }
-            return
+            eraseChar(event, current, previous)
         }
 
         if (keyText === "ENTER") {
@@ -118,16 +94,9 @@ document.querySelector(".keyboard").addEventListener("mousedown", function KeyCl
                 row.querySelectorAll(".cell").forEach(cell => { // save inputs as 1 word
                     GUESSED_WORD += cell.value.toUpperCase()
                 })
-                CheckWord(row)
-                for (let i = 0; i < SECRET_WORD.length; i++) { // check win
-                    if (GUESSED_WORD.toUpperCase() === SECRET_WORD.toUpperCase()) {
-                        console.log("WIN")
-                        cells.forEach(cell => cell.disabled = true) // disable all cells because win
-                        return
-                    }
-                }
+                checkWord(row, GUESSED_WORD, SECRET_WORD)
+                checkWin(GUESSED_WORD, SECRET_WORD, cells)
                 if (!current.parentElement.nextElementSibling) { // last guess aka last row
-                    console.log('end')
                     isLastGuess = true
                     return 
                 }
@@ -142,40 +111,144 @@ document.querySelector(".keyboard").addEventListener("mousedown", function KeyCl
             }
         }
 
-        if (current.value.length === 0) {
-            current.value = keyText
-            current.classList.add("full")
-        } else {
-            if (next) {
-                next.focus()
-                next.value = keyText
-                next.classList.add("full")
-            }
+        if (!latinLettersRegex.test(keyText)) { // check if entered latin chars
+            event.preventDefault()
+            return
         }
+
+        isEmpty(current)
+        addChar(current, next, keyText)
     }
 })
 
-function CheckWord(row) {
-    let CurrentWordArray = GUESSED_WORD.toUpperCase().split("")
-    let SecretWordArray = SECRET_WORD.toUpperCase().split("")
+function addChar(currentElement, nextElement, value) {
+    if (currentElement.value.length === 0) {
+        currentElement.value = value
+        currentElement.classList.add("full", "current")
+    } else {
+        if (nextElement) {
+            nextElement.focus()
+            nextElement.value = value
+            currentElement.classList.remove("current")
+            nextElement.classList.add("full", "current")
+        }
+    }
+}
 
-    for (let i = 0; i < SECRET_WORD.length; i++) {
-        let cell = row.querySelectorAll(".cell")[i]
-        let poolIndex = SecretWordArray.indexOf(CurrentWordArray[i]);
+function eraseChar(event, currentElement, previousElement) {
+    event.preventDefault()
+    if (isLastGuess) return
+    if (currentElement.value.length === 1) {
+        currentElement.value = ""
+        currentElement.classList.remove("full")
+    } else {
+        if (previousElement) {
+            previousElement.focus()
+            currentElement.classList.remove("current")
+            previousElement.classList.remove("full")
+            previousElement.value = ""
+            previousElement.classList.add("current")
+        }
+    }
+    return
+}
 
+function checkWord(row, guessedWord, secretWord) {
+    let CurrentWordArray = guessedWord.toUpperCase().split("")
+    let SecretWordArray = secretWord.toUpperCase().split("")
+
+    for (let i = 0; i < secretWord.length; i++) {
+        let cell = row.querySelectorAll(".cell")[i];
         if (CurrentWordArray[i] === SecretWordArray[i]) {
-            row.querySelectorAll(".cell")[i].classList.add("correct")
+            cell.classList.add("correct")
+            document.querySelector(`[data-key="${cell.value.toUpperCase()}"]`).classList.add("correct")
+            SecretWordArray[i] = null; 
+            CurrentWordArray[i] = null; 
         }
-        else if (poolIndex !== -1) {
-            row.querySelectorAll(".cell")[i].classList.add("match")
-        } 
-        else {
-            row.querySelectorAll(".cell")[i].classList.add("wrong")
+    }
+    for (let i = 0; i < secretWord.length; i++) {
+        let cell = row.querySelectorAll(".cell")[i]
+        let finalClass = "wrong"
+        if (cell.classList.contains("correct")) {
+            finalClass = "correct";
+        } else {
+            let poolIndex = SecretWordArray.indexOf(CurrentWordArray[i])
+            if (poolIndex !== -1) {
+                finalClass = "match"
+                SecretWordArray[poolIndex] = null
+            }
         }
-    
         const delay = i * 400
         cell.classList.add("flip")
-        cell.style.animationDelay = `${delay}ms`;
-        cell.style.transitionDelay = `${delay}ms`;
+        cell.style.animationDelay = `${delay}ms`
+        cell.style.transitionDelay = `${delay}ms`
+        cell.classList.add(finalClass)
+        let originalLetter = CurrentWordArray[i]; 
+        
+        let key = document.querySelector(`[data-key="${originalLetter}"]`);
+        
+        if (key) { // CHECK FOR LETTER COLORING !!!!!! IT IS NOT WORKING PROPERLY NOW !!! wrong>logic>clock
+            // ЛОГІКА ПОКРАЩЕННЯ КОЛЬОРУ:
+            
+            if (finalClass === "correct") {
+                // Якщо літера зелена — примусово фарбуємо кнопку в зелений (це топ-статус)
+                key.classList.remove("match", "wrong");
+                key.classList.add("correct");
+            } 
+            else if (finalClass === "match") {
+                // Якщо літера жовта — фарбуємо кнопку ТІЛЬКИ якщо вона ще НЕ зелена
+                if (!key.classList.contains("correct")) {
+                    key.classList.remove("wrong");
+                    key.classList.add("match");
+                }
+            } 
+            else if (finalClass === "wrong") {
+                // Якщо літера чорна — фарбуємо кнопку ТІЛЬКИ якщо вона ще взагалі не вгадувалась (не зелена і не жовта)
+                if (!key.classList.contains("correct") && !key.classList.contains("match")) {
+                    key.classList.add("wrong");
+                }
+            }
+        } // CHECK FOR LETTER COLORING !!!!!! IT IS NOT WORKING PROPERLY NOW !!! wrong>logic>clock
+    } 
+    // for (let i = 0; i < secretWord.length; i++) {
+        // let cell = row.querySelectorAll(".cell")[i]
+        // let key = document.querySelector(`[data-key="${cell.value.toUpperCase()}"]`)
+        // let poolIndex = SecretWordArray.indexOf(CurrentWordArray[i]);
+
+        // if (CurrentWordArray[i] === SecretWordArray[i]) {
+        //     cell.classList.add("correct")
+        //     setTimeout(() => {
+        //         key.classList.add("correct")
+        //     }, 2000) // 2000 = secretWord.length * 400
+        // }
+        // else if (poolIndex !== -1) {
+        //     cell.classList.add("match")
+        //     setTimeout(() => {
+        //         key.classList.add("match")
+        //     }, 2000)
+        // } 
+        // else {
+        //     cell.classList.add("wrong")
+        //     setTimeout(() => {
+        //         key.classList.add("wrong")
+        //     }, 2000)
+        // }
+    // }
+}
+
+function checkWin(guessedWord, secretWord, cellsArray) {
+    for (let i = 0; i < secretWord.length; i++) { // check win
+        if (guessedWord.toUpperCase() === secretWord.toUpperCase()) {
+            console.log("WIN")
+            cellsArray.forEach(cell => cell.disabled = true) // disable all cells because win
+            isWin = true
+            return
+        }
+    }
+}
+
+function isEmpty(cell) {
+    if (cell.value.length === 0) {
+        cell.classList.remove("full")
     }
 }
